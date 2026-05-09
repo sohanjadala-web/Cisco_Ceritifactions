@@ -1,0 +1,597 @@
+:root {
+    --bg-dark: #020617;
+    --cyan: #00f3ff;
+    --blue: #0066ff;
+    --neon-blue: #0ea5e9;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-highlight: rgba(255, 255, 255, 0.2);
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Rajdhani', sans-serif;
+    background: #020617;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 0% 0%, rgba(0, 243, 255, 0.05) 0%, transparent 30%),
+        radial-gradient(circle at 100% 100%, rgba(0, 102, 255, 0.05) 0%, transparent 30%);
+    color: var(--text-main);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Canvas Background */
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Layout */
+.app-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.header {
+    position: absolute;
+    top: 8%;
+    text-align: center;
+    z-index: 10;
+    animation: fadeInDown 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(-30px);
+    pointer-events: auto;
+}
+
+.neon-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #fff;
+    text-shadow: 
+        0 0 10px rgba(0, 243, 255, 0.8),
+        0 0 20px rgba(0, 243, 255, 0.4),
+        0 0 40px rgba(0, 102, 255, 0.3);
+    margin-bottom: 0.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.neon-title:hover {
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); text-shadow: 0 0 10px rgba(0, 243, 255, 0.8); }
+    20% { transform: translate(-2px, 2px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
+    40% { transform: translate(-2px, -2px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
+    60% { transform: translate(2px, 2px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
+    80% { transform: translate(2px, -2px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
+    100% { transform: translate(0); text-shadow: 0 0 10px rgba(0, 243, 255, 0.8); }
+}
+
+.neon-title::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+    0% { left: -100%; }
+    100% { left: 200%; }
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--cyan);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.typing-wrapper {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.typing-container {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 18px;
+    background-color: var(--cyan);
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+}
+
+.subtitle a {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.subtitle a:hover {
+    color: #fff;
+    text-shadow: 0 0 10px var(--cyan);
+    transform: translateY(-2px);
+}
+
+/* 3D Carousel Scene */
+.carousel-container {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    height: 60vh;
+    perspective: 1200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+    margin-top: 5vh;
+    pointer-events: none;
+}
+
+.carousel-scene {
+    position: relative;
+    z-index: 6;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out; /* Parallax container transition */
+    pointer-events: none;
+}
+
+/* Certificate Cards */
+.cert-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 360px;
+    height: 380px;
+    margin-left: -180px;
+    margin-top: -190px;
+    transform-style: preserve-3d;
+    will-change: transform;
+    cursor: pointer;
+    /* initial state hidden */
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 1s ease-out;
+}
+
+.cert-card.visible {
+    opacity: 1;
+}
+
+.cert-glass.badge-style {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #00bceb; /* Base cyan for top */
+    border: none;
+    border-radius: 28px;
+    padding: 0 12px 12px 12px; /* Thick cyan border around sides and bottom */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(0, 188, 235, 0.1);
+    border: 1px solid rgba(0, 188, 235, 0.3);
+    /* remove backdrop-filter to match the solid badge look */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transform-style: preserve-3d;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.badge-top {
+    background: #00bceb;
+    padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+    position: relative;
+    z-index: 3;
+    transform: translateZ(20px);
+    transition: transform 0.3s ease;
+}
+
+.badge-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.cisco-logo svg {
+    width: 100px;
+    height: auto;
+}
+
+.academy-text {
+    font-family: 'Arial', sans-serif;
+    font-weight: 300;
+    font-size: 1.4rem;
+    color: #102241;
+    line-height: 1.1;
+    text-align: left;
+}
+
+.badge-middle {
+    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    z-index: 2;
+    background: #1e3050;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    overflow: hidden; /* Ensure waves don't overflow the rounded corners */
+    transform: translateZ(10px);
+}
+
+.verified-banner {
+    background: #1e3050;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    font-size: 1.6rem;
+    padding: 0.6rem 2rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 4;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    max-width: 85%;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+}
+
+.badge-waves {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+}
+
+.badge-bottom {
+    background: white;
+    color: #102241;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.6rem;
+    padding: 1.5rem 2rem;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align text to the right */
+    z-index: 5;
+    margin-top: -1px; /* Pull up slightly to prevent gap */
+    min-height: 80px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    transform: translateZ(20px);
+    transition: transform 0.3s ease;
+}
+
+.badge-title {
+    font-weight: 500;
+    z-index: 6;
+}
+
+/* Hover Effects */
+.cert-card:hover .cert-glass.badge-style {
+    box-shadow: 
+        0 40px 80px -10px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(0, 188, 235, 0.6);
+    border: 1px solid rgba(0, 188, 235, 0.6);
+}
+
+.cert-card:hover .badge-top,
+.cert-card:hover .badge-bottom {
+    transform: translateZ(40px);
+}
+
+.cert-card:hover .verified-banner {
+    transform: translateZ(50px);
+}
+
+/* Glare Effect */
+.glare {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.03) 45%,
+        rgba(255,255,255,0.15) 50%,
+        rgba(255,255,255,0.03) 55%,
+        rgba(255,255,255,0) 100%
+    );
+    transform: rotate(30deg) translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.1s ease-out;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.6;
+    animation: fadeIn 2s ease-in 1s forwards;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mouse {
+    width: 26px;
+    height: 40px;
+    border: 2px solid var(--text-dim);
+    border-radius: 20px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.wheel {
+    width: 4px;
+    height: 8px;
+    background: var(--cyan);
+    border-radius: 2px;
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scroll 1.5s infinite;
+}
+
+.scroll-indicator p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 0.6;
+    }
+}
+
+@keyframes scroll {
+    0% { transform: translate(-50%, 0); opacity: 1; }
+    100% { transform: translate(-50%, 15px); opacity: 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .neon-title {
+        font-size: 1.8rem;
+    }
+    .cert-card {
+        width: 260px;
+        height: 380px;
+        margin-left: -130px;
+        margin-top: -190px;
+    }
+}
+
+/* Green Badge Variant */
+.cert-glass.badge-style.badge-green {
+    background: #71bf44;
+}
+
+.cert-glass.badge-style.badge-green .badge-top {
+    background: #71bf44;
+}
+
+/* Certificate Modal */
+.cert-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+}
+
+.cert-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(2, 6, 23, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1001;
+    max-width: 90vw;
+    max-height: 90vh;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.7), 
+        0 0 60px rgba(0, 243, 255, 0.3),
+        inset 0 0 20px rgba(0, 243, 255, 0.1);
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cert-modal.active .modal-content {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.modal-close {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 40px;
+    height: 40px;
+    background: var(--bg-dark);
+    border: 2px solid var(--cyan);
+    color: var(--cyan);
+    font-size: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1002;
+}
+
+.modal-close:hover {
+    background: var(--cyan);
+    color: var(--bg-dark);
+    transform: rotate(90deg);
+}
+
+.modal-image-container {
+    overflow: hidden;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+.modal-image-container img {
+    max-width: 100%;
+    max-height: calc(90vh - 40px);
+    object-fit: contain;
+    border-radius: 4px;
+    transition: transform 0.3s ease-out;
+}
+
+/* Add a subtle tilt effect to the image on hover */
+.modal-image-container:hover img {
+    transform: scale(1.05);
+}
+
+.modal-image-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        transparent 0%,
+        rgba(0, 243, 255, 0.1) 50%,
+        transparent 100%
+    );
+    background-size: 100% 200%;
+    animation: scanModal 3s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scanModal {
+    0% { background-position: 0 -200%; }
+    100% { background-position: 0 200%; }
+}
+
+/* Custom Scrollbar for Modal if needed */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cyan);
+}
