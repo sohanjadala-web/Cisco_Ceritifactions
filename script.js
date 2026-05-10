@@ -263,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const imageSrc = card.getAttribute('data-image');
             const modalImage = document.getElementById('modalImage');
             
+            // Update Image
             if (imageSrc) {
                 modalImage.src = imageSrc;
             } else {
